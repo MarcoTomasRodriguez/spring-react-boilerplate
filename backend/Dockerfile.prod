@@ -1,0 +1,11 @@
+FROM gradle:jdk11 as build
+WORKDIR /app
+COPY build.gradle.kts settings.gradle.kts ./
+COPY src/ ./src
+RUN gradle bootJar
+
+FROM openjdk:11-jre-slim
+WORKDIR /app
+ENV SERVER_PORT=80
+COPY --from=build /app/build/libs/*.jar application.jar
+ENTRYPOINT java -jar application.jar
